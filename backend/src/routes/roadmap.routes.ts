@@ -73,8 +73,9 @@ router.get('/:id', async (req: Request, res: Response) => {
       where: { id },
       include: { 
         contents: true,
+        challenges: true,
         author: {
-          select: { name: true }
+          select: { id: true, name: true }
         }
       }
     });

@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import roadmapRoutes from './routes/roadmap.routes';
+import progressRoutes from './routes/progress.routes';
 
 const app: Express = express();
 const port = process.env.PORT || 8080;
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/roadmaps', roadmapRoutes);
+app.use('/api/progress', progressRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {

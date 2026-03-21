@@ -8,22 +8,35 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
+  id        String         @id @default(uuid())
   name      String
-  email     String    @unique
+  email     String         @unique
   password  String
-  createdAt DateTime  @default(now())
+  createdAt DateTime       @default(now())
   roadmaps  Roadmap[]
+  idCard    IdCard?
+  progress  UserProgress[]
+}
+
+model IdCard {
+  id          String @id @default(uuid())
+  studentName String
+  matricula   String @unique
+  level       Int    @default(1)
+  xp          Int    @default(0)
+  userId      String? @unique
+  user        User?   @relation(fields: [userId], references: [id])
 }
 
 model Roadmap {
-  id          String    @id @default(uuid())
+  id          String      @id @default(uuid())
   title       String
   description String
   level       String
   authorId    String
-  author      User      @relation(fields: [authorId], references: [id])
+  author      User        @relation(fields: [authorId], references: [id])
   contents    Content[]
+  challenges  Challenge[]
 }
 
 model Content {
@@ -40,8 +53,23 @@ model Glossary {
   definition String
 }
 
-model IdCard {
-  id          String @id @default(uuid())
-  studentName String
-  matricula   String @unique
+model Challenge {
+  id          String         @id @default(uuid())
+  title       String
+  description String
+  xpReward    Int
+  roadmapId   String
+  roadmap     Roadmap        @relation(fields: [roadmapId], references: [id])
+  progress    UserProgress[]
+}
+
+model UserProgress {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+  completedAt DateTime  @default(now())
+
+  @@unique([userId, challengeId])
 }
