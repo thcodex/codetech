@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-100: #dbeafe;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  
+  --font-sans: var(--font-inter);
+}
+
+@layer base {
+  :root {
+    --background: #09090B;
+    --foreground: #FAFAFA;
+    --card: #18181B;
+    --border: #27272A;
+    --muted: #A1A1AA;
+    --ring: #3b82f6;
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family: var(--font-sans), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .card-hover {
+    @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)];
+  }
+}
