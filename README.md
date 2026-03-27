@@ -77,4 +77,4 @@ A plataforma é mantida e gerida por:
 - **Michel Tenorio**
 
 ---
-Desenvolvido com ❤️ pelo time CodeTech.
+Desenvolvido com ❤️ pelo time CodeTech para o Projeto Interdisciplinar da Escola Superior Batista do Amazonas - ESBAM. 💚
