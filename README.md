@@ -77,10 +77,4 @@ A plataforma é mantida e gerida por:
 - **Michel Tenorio**
 
 ---
-
-## 🎨 Filosofia de Design
-
-A CodeTech não é apenas sobre aprender código; é sobre a experiência. Utilizamos **Grainy Gradients**, **Glassmorphism**, e animações de entrada escalonadas para garantir que cada clique na plataforma pareça premium e moderno.
-
----
 Desenvolvido com ❤️ pelo time CodeTech.
