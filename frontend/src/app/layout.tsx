@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { TopNav } from '@/components/layout/topnav';
+import { AppShell } from '@/components/layout/AppShell';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,12 +24,7 @@ export default function RootLayout({
         <div className="fixed bottom-[10%] right-[10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
         <div className="fixed top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none -z-10" />
 
-        <TopNav />
-        
-        {/* Main Content Container */}
-        <main className="flex-1 w-full max-w-7xl mx-auto flex flex-col relative z-10 pt-10 px-8">
-          {children}
-        </main>
+        <AppShell>{children}</AppShell>
 
       </body>
     </html>

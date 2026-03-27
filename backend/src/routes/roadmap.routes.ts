@@ -1,10 +1,11 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../prisma';
+import { requireAdmin } from '../middleware/requireAdmin';
 
 const router = Router();
 
-// CREATE: Post a new roadmap
-router.post('/', async (req: Request, res: Response) => {
+// CREATE: Post a new roadmap (Admin only)
+router.post('/', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { title, description, level, authorId } = req.body;
     
@@ -91,8 +92,8 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 });
 
-// UPDATE: Update a roadmap
-router.put('/:id', async (req: Request, res: Response) => {
+// UPDATE: Update a roadmap (Admin only)
+router.put('/:id', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { title, description, level } = req.body;
@@ -116,8 +117,8 @@ router.put('/:id', async (req: Request, res: Response) => {
   }
 });
 
-// DELETE: Remove a roadmap
-router.delete('/:id', async (req: Request, res: Response) => {
+// DELETE: Remove a roadmap (Admin only)
+router.delete('/:id', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     

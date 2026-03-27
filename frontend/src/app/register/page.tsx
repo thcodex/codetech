@@ -1,0 +1,138 @@
+'use client';
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { Code2, UserPlus, Eye, EyeOff } from 'lucide-react';
+
+export default function RegisterPage() {
+  const { register } = useAuth();
+  const router = useRouter();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (password.length < 6) {
+      setError('A senha deve ter no mínimo 6 caracteres.');
+      return;
+    }
+    setLoading(true);
+    const result = await register(name, email, password);
+    setLoading(false);
+    if (result.success) {
+      router.push('/');
+    } else {
+      setError(result.error || 'Erro ao registrar.');
+    }
+  };
+
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-[#0A0B14]" />
+      <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[120px] pointer-events-none" />
+
+      <div className="relative z-10 w-full max-w-md px-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-10">
+          <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.4)] mb-6 border border-blue-400/20">
+            <Code2 className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-blue-400">Criar Conta</span>
+          </h1>
+          <p className="text-[#8F95B2] text-sm mt-2 font-medium">Junte-se à comunidade CodeTech</p>
+        </div>
+
+        {/* Register Form Card */}
+        <div className="rounded-[28px] bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] p-8 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-[250px] h-[250px] bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none rounded-tl-[28px]" />
+          
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm font-medium relative z-10">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-[#8F95B2] uppercase tracking-widest">Nome Completo</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Seu nome"
+                className="w-full h-12 px-4 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white text-sm font-medium placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all hover:bg-white/[0.05]"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-[#8F95B2] uppercase tracking-widest">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="seu@email.com"
+                className="w-full h-12 px-4 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white text-sm font-medium placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all hover:bg-white/[0.05]"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-[#8F95B2] uppercase tracking-widest">Senha</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  className="w-full h-12 px-4 pr-12 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white text-sm font-medium placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all hover:bg-white/[0.05]"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8F95B2] hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm transition-all shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] active:scale-[0.98] border border-blue-500/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <UserPlus className="w-4 h-4" /> Cadastrar
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center relative z-10">
+            <p className="text-[#8F95B2] text-sm">
+              Já tem conta?{' '}
+              <Link href="/login" className="text-blue-400 hover:text-blue-300 font-bold transition-colors">
+                Faça login
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

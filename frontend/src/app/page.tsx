@@ -3,12 +3,12 @@ import { Code, Database, Palette, ArrowRight, ListOrdered, BrainCircuit, BookOpe
 
 export default function Home() {
   return (
-    <div className="w-full space-y-12 animate-in fade-in duration-500 pb-24">
+    <div className="w-full space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-24 stagger-children">
       
       {/* Page Title & Subtitle */}
       <div className="space-y-2">
-        <h1 className="text-[40px] font-bold text-white tracking-tight flex items-center gap-2">
-          Conteúdos <span className="text-[#8b5cf6] font-normal">+</span>
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-2">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400">Conteúdos</span> <span className="text-purple-400/60 font-normal">+</span>
         </h1>
         <p className="text-[#8F95B2] text-[15px] font-medium">Acesse seus conteúdos disponíveis abaixo</p>
       </div>
@@ -24,7 +24,7 @@ export default function Home() {
           <div className="w-14 h-14 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center mb-8 shadow-inner relative z-10">
             <Code className="w-6 h-6 text-[#A78BFA]" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3 relative z-10 tracking-tight">Frontend</h2>
+          <h2 className="text-2xl font-bold mb-3 relative z-10 tracking-tight"><span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">Frontend</span></h2>
           <p className="text-[#8F95B2] text-sm leading-[1.7] mb-8 flex-1 relative z-10 font-medium">
             Aprenda a criar interfaces modernas e responsivas com React, HTML, CSS e JavaScript.
           </p>
@@ -41,7 +41,7 @@ export default function Home() {
           <div className="w-14 h-14 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center mb-8 shadow-inner relative z-10">
             <Database className="w-6 h-6 text-blue-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3 relative z-10 tracking-tight">Backend</h2>
+          <h2 className="text-2xl font-bold mb-3 relative z-10 tracking-tight"><span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-300">Backend</span></h2>
           <p className="text-[#8F95B2] text-sm leading-[1.7] mb-8 flex-1 relative z-10 font-medium">
             Domine o desenvolvimento server-side com Node.js, APIs REST e bancos de dados.
           </p>
@@ -58,7 +58,7 @@ export default function Home() {
           <div className="w-14 h-14 rounded-2xl bg-white/[0.05] border border-white/10 flex items-center justify-center mb-8 shadow-inner relative z-10">
             <Palette className="w-6 h-6 text-pink-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3 relative z-10 tracking-tight">UI/UX Design</h2>
+          <h2 className="text-2xl font-bold mb-3 relative z-10 tracking-tight"><span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-300">UI/UX Design</span></h2>
           <p className="text-[#8F95B2] text-sm leading-[1.7] mb-8 flex-1 relative z-10 font-medium">
             Desenvolva habilidades de design de interface e experiência do usuário com ferramentas modernas.
           </p>

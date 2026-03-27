@@ -9,7 +9,7 @@ export default function IdCardPage() {
     nome: 'Thiago Ramos',
     cargo: 'Desenvolvedor Frontend',
     github: 'thcodex',
-    linkedin: 'teagga',
+    linkedin: 'thcodde',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +19,7 @@ export default function IdCardPage() {
   const autoDescription = `Estou empolgado em anunciar que sou aluno do CodeTech do @${formData.linkedin || 'codetech'} 🚀\n\nO CodeTech é um ambiente que ensina desenvolvimento full stack seguindo as demandas do mercado 💻\n\nEstou ansioso para explorar mais o universo da programação. Venha fazer parte dessa jornada comigo!\n\n👉 Link da plataforma: https://${formData.github || 'github'}.com/codetech`;
 
   return (
-    <div className="min-h-screen w-full flex flex-col relative overflow-hidden items-center p-4 py-12 md:p-12 z-0">
+    <div className="min-h-screen w-full flex flex-col relative overflow-hidden items-center p-4 py-12 md:p-12 z-0 animate-in fade-in slide-in-from-bottom-4 duration-700 stagger-children">
 
       <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
 
@@ -29,7 +29,7 @@ export default function IdCardPage() {
             <Fingerprint className="w-3.5 h-3.5" />
             Badge de Acesso
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-white/50 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-indigo-400 tracking-tight">
             Seu ID CodeTech.
           </h1>
           <p className="text-[#8F95B2] text-lg max-w-xl mx-auto font-medium">
@@ -77,8 +77,8 @@ export default function IdCardPage() {
               {/* Bottom Content Area */}
               <div className="flex-1 px-8 pb-8 pt-4 flex flex-col bg-[#12131C]/60 z-10 relative">
 
-                <h2 className="text-3xl font-bold text-white tracking-tight truncate filter drop-shadow hover:text-purple-300 transition-colors">
-                  {formData.nome || 'Seu Nome'}
+                <h2 className="text-3xl font-bold tracking-tight truncate filter drop-shadow hover:text-purple-300 transition-colors">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">{formData.nome || 'Seu Nome'}</span>
                 </h2>
                 <p className="text-[#8F95B2] text-sm font-medium mt-1 truncate">
                   {formData.cargo || 'Cargo'}

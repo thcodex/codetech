@@ -2,6 +2,9 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import roadmapRoutes from './routes/roadmap.routes';
 import progressRoutes from './routes/progress.routes';
+import challengeRoutes from './routes/challenge.routes';
+import dashboardRoutes from './routes/dashboard.routes';
+import authRoutes from './routes/auth.routes';
 
 const app: Express = express();
 const port = process.env.PORT || 8080;
@@ -14,8 +17,11 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/roadmaps', roadmapRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/challenges', challengeRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {

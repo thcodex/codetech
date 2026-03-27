@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowLeft, Loader2, Map } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const formSchema = z.object({
   title: z.string().min(5, { message: 'O título deve ter no mínimo 5 caracteres.' }),
@@ -23,6 +24,14 @@ type FormValues = z.infer<typeof formSchema>;
 export default function NovoRoadmap() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState('');
+  const { user } = useAuth();
+
+  // Redirect non-admins
+  useEffect(() => {
+    if (user && user.role !== 'admin') {
+      router.push('/roadmaps');
+    }
+  }, [user, router]);
 
   const {
     register,
@@ -43,7 +52,10 @@ export default function NovoRoadmap() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
       const res = await fetch(`${apiUrl}/roadmaps`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-id': user?.id || '',
+        },
         body: JSON.stringify(data),
       });
 
@@ -59,7 +71,7 @@ export default function NovoRoadmap() {
   };
 
   return (
-    <div className="flex-1 w-full max-w-4xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
+    <div className="flex-1 w-full max-w-4xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 stagger-children">
       
       {/* Top action bar */}
       <div className="flex items-center">
@@ -76,7 +88,7 @@ export default function NovoRoadmap() {
         <div className="w-12 h-12 bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 rounded-xl flex items-center justify-center mb-4">
           <Map className="w-6 h-6 text-[#A78BFA]" />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Criar Novo Roadmap</h1>
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight"><span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-violet-200 to-purple-400">Criar Novo Roadmap</span></h1>
         <p className="mt-2 text-[#8F95B2]">Defina as etapas e os detalhes do novo guia de estudo em tecnologia.</p>
       </div>
 

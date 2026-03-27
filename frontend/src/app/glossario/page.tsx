@@ -42,14 +42,14 @@ export default function GlossarioPage() {
   }).sort((a, b) => a.term.localeCompare(b.term));
 
   return (
-    <div className="flex-1 w-full max-w-6xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500 pb-24">
+    <div className="flex-1 w-full max-w-6xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-24 stagger-children">
       
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
         <div>
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white drop-shadow-sm flex items-center gap-3">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight drop-shadow-sm flex items-center gap-3">
             <BookA className="w-10 h-10 text-purple-400" />
-            Glossário Tech
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-emerald-200 to-teal-400">Glossário Tech</span>
           </h1>
           <p className="mt-4 text-[#8F95B2] font-medium leading-relaxed max-w-2xl">
             Um dicionário completo de termos técnicos e jargões da programação focado em simplificar o seu aprendizado de forma rápida e precisa.

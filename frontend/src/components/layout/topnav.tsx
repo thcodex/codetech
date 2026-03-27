@@ -3,14 +3,20 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Code2, LogOut, Menu, X, Bell, ChevronDown } from 'lucide-react';
+import { Code2, LogOut, Menu, X, Bell, ChevronDown, Shield } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function TopNav() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+
+  const isAdmin = user?.role === 'admin';
+  const initials = user?.name?.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase() || 'CT';
 
   const navItems = [
     { name: 'Conteúdos', href: '/' },
+    { name: 'Dashboard', href: '/dashboard' },
     { name: 'ID Card', href: '/id-card' },
     { name: 'Roadmap', href: '/roadmaps' },
     { name: 'Glossário', href: '/glossario' },
@@ -69,16 +75,19 @@ export function TopNav() {
           {/* User Profile Dropdown Pill */}
           <button className="flex items-center gap-3 pl-2 pr-3 py-1.5 rounded-[20px] border border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/10 transition-all group cursor-pointer active:scale-95 shadow-sm">
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center shadow-inner group-hover:shadow-[0_0_15px_rgba(139,92,246,0.6)] transition-all relative overflow-hidden ring-1 ring-white/10">
-              <span className="text-white text-[11px] font-bold tracking-wider relative z-10">TH</span>
+                <span className="text-white text-[11px] font-bold tracking-wider relative z-10">{initials}</span>
               {/* Avatar hover animation */}
               <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             
             <div className="flex flex-col items-start pr-1">
-              <span className="text-white text-xs font-bold leading-tight group-hover:text-purple-200 transition-colors">Thiago Silva</span>
-              <span className="text-purple-400 text-[9px] uppercase tracking-[0.2em] font-extrabold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)] animate-pulse" />
-                Online
+              <span className="text-white text-xs font-bold leading-tight group-hover:text-purple-200 transition-colors">{user?.name || 'Usuário'}</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] font-extrabold flex items-center gap-1">
+                {isAdmin ? (
+                  <><Shield className="w-2.5 h-2.5 text-amber-400" /><span className="text-amber-400">Admin</span></>
+                ) : (
+                  <><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)] animate-pulse" /><span className="text-purple-400">Online</span></>
+                )}
               </span>
             </div>
             
@@ -120,7 +129,10 @@ export function TopNav() {
           </div>
           
           <div className="mt-8 pt-6 border-t border-white/[0.08]">
-            <button className="flex items-center justify-center gap-3 w-full px-4 py-4 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 transition-all text-white text-base font-semibold shadow-md">
+            <button 
+              onClick={logout}
+              className="flex items-center justify-center gap-3 w-full px-4 py-4 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 transition-all text-white text-base font-semibold shadow-md"
+            >
               <LogOut className="w-5 h-5 opacity-70 rotate-180" />
               Sair da plataforma
             </button>
