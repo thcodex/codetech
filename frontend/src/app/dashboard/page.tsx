@@ -1,10 +1,11 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { 
   TrendingUp, Flame, Target, Trophy, Zap, 
-  ChevronLeft, Calendar, BarChart3, Star
+  ChevronLeft, Calendar, BarChart3, Star, RefreshCw
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DashboardData {
   user: {
@@ -29,31 +30,41 @@ interface DashboardData {
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    async function fetchDashboard() {
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
-        // First get users to find the current user
-        const usersRes = await fetch(`${apiUrl}/roadmaps`);
-        const roadmaps = await usersRes.json();
-        
-        if (roadmaps && roadmaps.length > 0) {
-          const userId = roadmaps[0].authorId;
-          const res = await fetch(`${apiUrl}/dashboard/${userId}`);
-          if (res.ok) {
-            const dashboardData = await res.json();
-            setData(dashboardData);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching dashboard:', error);
-      } finally {
-        setLoading(false);
+  const fetchDashboard = useCallback(async (showRefreshIndicator = false) => {
+    if (!user?.id) return;
+    if (showRefreshIndicator) setIsRefreshing(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+      const res = await fetch(`${apiUrl}/dashboard/${user.id}`);
+      if (res.ok) {
+        const dashboardData = await res.json();
+        setData(dashboardData);
+        setLastUpdated(new Date());
       }
+    } catch (error) {
+      console.error('Error fetching dashboard:', error);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
     }
+  }, [user?.id]);
+
+  // Initial fetch
+  useEffect(() => {
     fetchDashboard();
-  }, []);
+  }, [fetchDashboard]);
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDashboard(false);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [fetchDashboard]);
 
   if (loading) {
     return (
@@ -80,9 +91,25 @@ export default function DashboardPage() {
           </h1>
           <p className="text-[#8F95B2] text-sm mt-2 font-medium">Acompanhe sua evolução semanal e os XP dos desafios.</p>
         </div>
-        <div className="hidden md:flex items-center gap-2 text-xs text-[#8F95B2]">
-          <Calendar className="w-4 h-4" />
-          Últimos 7 dias
+        <div className="hidden md:flex items-center gap-3">
+          {lastUpdated && (
+            <span className="text-[#8F95B2]/60 text-[11px] font-medium">
+              Atualizado {lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+          <button
+            onClick={() => fetchDashboard(true)}
+            disabled={isRefreshing}
+            className="p-2 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.08] hover:border-purple-500/30 transition-all active:scale-95 cursor-pointer disabled:opacity-50 group"
+            title="Atualizar dados"
+          >
+            <RefreshCw className={`w-4 h-4 text-[#8F95B2] group-hover:text-purple-300 transition-colors ${isRefreshing ? 'animate-spin' : ''}`} />
+          </button>
+          <div className="flex items-center gap-2 text-xs text-[#8F95B2] bg-white/[0.02] border border-white/[0.05] px-3 py-1.5 rounded-xl">
+            <Calendar className="w-4 h-4" />
+            Últimos 7 dias
+          </div>
+          <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" title="Atualização em tempo real" />
         </div>
       </div>
 

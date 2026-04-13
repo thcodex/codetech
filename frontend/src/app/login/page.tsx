@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Code2, LogIn, Eye, EyeOff, Shield, User } from 'lucide-react';
+import { Code2, LogIn, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -26,10 +26,6 @@ export default function LoginPage() {
       setError(result.error || 'Erro ao fazer login.');
     }
   };
-
-  // Quick fill helpers
-  const fillAdmin = () => { setEmail('thiago@codetech.dev'); setPassword('admin123'); };
-  const fillStudent = () => { setEmail(''); setPassword(''); };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden">
@@ -55,23 +51,6 @@ export default function LoginPage() {
         <div className="rounded-[28px] bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] p-8 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-[250px] h-[250px] bg-gradient-to-bl from-purple-500/5 to-transparent pointer-events-none rounded-tr-[28px]" />
           
-          {/* Quick Access Buttons */}
-          <div className="flex gap-3 mb-6 relative z-10">
-            <button
-              type="button"
-              onClick={fillAdmin}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-wider hover:bg-purple-500/20 transition-all active:scale-95"
-            >
-              <Shield className="w-3.5 h-3.5" /> Admin
-            </button>
-            <button
-              type="button"
-              onClick={fillStudent}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider hover:bg-blue-500/20 transition-all active:scale-95"
-            >
-              <User className="w-3.5 h-3.5" /> Aluno
-            </button>
-          </div>
 
           {error && (
             <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm font-medium relative z-10">

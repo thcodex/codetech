@@ -1,18 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Code2, LogOut, Menu, X, Bell, ChevronDown, Shield } from 'lucide-react';
+import { Code2, LogOut, Menu, X, Bell, ChevronDown, Shield, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function TopNav() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
 
   const isAdmin = user?.role === 'admin';
   const initials = user?.name?.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase() || 'CT';
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const navItems = [
     { name: 'Conteúdos', href: '/' },
@@ -72,29 +85,75 @@ export function TopNav() {
             <span className="absolute top-2 right-2.5 w-[7px] h-[7px] rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)] animate-pulse border-2 border-[#0F111A]" />
           </button>
 
-          {/* User Profile Dropdown Pill */}
-          <button className="flex items-center gap-3 pl-2 pr-3 py-1.5 rounded-[20px] border border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/10 transition-all group cursor-pointer active:scale-95 shadow-sm">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center shadow-inner group-hover:shadow-[0_0_15px_rgba(139,92,246,0.6)] transition-all relative overflow-hidden ring-1 ring-white/10">
+          {/* User Profile Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2.5 pl-2 pr-2.5 py-1.5 rounded-[20px] border border-white/[0.05] bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/10 transition-all group cursor-pointer active:scale-95 shadow-sm"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center shadow-inner group-hover:shadow-[0_0_15px_rgba(139,92,246,0.6)] transition-all relative overflow-hidden ring-1 ring-white/10 shrink-0">
                 <span className="text-white text-[11px] font-bold tracking-wider relative z-10">{initials}</span>
-              {/* Avatar hover animation */}
-              <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-            
-            <div className="flex flex-col items-start pr-1">
-              <span className="text-white text-xs font-bold leading-tight group-hover:text-purple-200 transition-colors">{user?.name || 'Usuário'}</span>
-              <span className="text-[9px] uppercase tracking-[0.2em] font-extrabold flex items-center gap-1">
-                {isAdmin ? (
-                  <><Shield className="w-2.5 h-2.5 text-amber-400" /><span className="text-amber-400">Admin</span></>
-                ) : (
-                  <><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)] animate-pulse" /><span className="text-purple-400">Online</span></>
-                )}
-              </span>
-            </div>
-            
-            <div className="w-6 h-6 rounded-full bg-white/[0.05] flex items-center justify-center group-hover:bg-purple-500/20 group-hover:border group-hover:border-purple-500/30 transition-all">
-              <ChevronDown className="w-3.5 h-3.5 text-[#8F95B2] group-hover:text-purple-300 transition-all duration-300 group-hover:rotate-180" />
-            </div>
-          </button>
+                <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+              
+              <div className="flex flex-col items-start">
+                <span className="text-white text-xs font-bold leading-tight group-hover:text-purple-200 transition-colors max-w-[120px] truncate">{user?.name || 'Usuário'}</span>
+                <span className="text-[9px] uppercase tracking-[0.2em] font-extrabold flex items-center gap-1">
+                  {isAdmin ? (
+                    <><Shield className="w-2.5 h-2.5 text-amber-400" /><span className="text-amber-400">Admin</span></>
+                  ) : (
+                    <><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)] animate-pulse shrink-0" /><span className="text-purple-400">Online</span></>
+                  )}
+                </span>
+              </div>
+              
+              <ChevronDown className={`w-3.5 h-3.5 text-[#8F95B2] group-hover:text-purple-300 transition-all duration-300 shrink-0 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[#161927]/95 backdrop-blur-2xl border border-white/[0.08] shadow-[0_20px_60px_rgba(0,0,0,0.5),0_0_30px_rgba(139,92,246,0.1)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
+                {/* User Info Header */}
+                <div className="px-4 py-3.5 border-b border-white/[0.06]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center ring-2 ring-purple-500/20 shrink-0">
+                      <span className="text-white text-xs font-bold tracking-wider">{initials}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-white text-sm font-bold truncate">{user?.name || 'Usuário'}</p>
+                      <p className="text-[#8F95B2] text-xs truncate">{user?.email || ''}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Menu Items */}
+                <div className="py-1.5">
+                  <Link
+                    href="/id-card"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-[#8F95B2] hover:text-white hover:bg-white/[0.05] transition-all group/item cursor-pointer"
+                  >
+                    <User className="w-4 h-4 group-hover/item:text-purple-400 transition-colors" />
+                    <span className="text-sm font-medium">Meu Perfil</span>
+                  </Link>
+                </div>
+
+                {/* Logout */}
+                <div className="border-t border-white/[0.06] py-1.5">
+                  <button
+                    onClick={() => {
+                      setIsDropdownOpen(false);
+                      logout();
+                    }}
+                    className="flex items-center gap-3 px-4 py-2.5 w-full text-red-400 hover:text-red-300 hover:bg-red-500/[0.08] transition-all group/item cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 group-hover/item:text-red-300 transition-colors" />
+                    <span className="text-sm font-medium">Sair da plataforma</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -131,9 +190,9 @@ export function TopNav() {
           <div className="mt-8 pt-6 border-t border-white/[0.08]">
             <button 
               onClick={logout}
-              className="flex items-center justify-center gap-3 w-full px-4 py-4 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 transition-all text-white text-base font-semibold shadow-md"
+              className="flex items-center justify-center gap-3 w-full px-4 py-4 rounded-2xl bg-red-500/[0.08] hover:bg-red-500/[0.15] border border-red-500/20 hover:border-red-500/30 transition-all text-red-400 hover:text-red-300 text-base font-semibold shadow-md"
             >
-              <LogOut className="w-5 h-5 opacity-70 rotate-180" />
+              <LogOut className="w-5 h-5" />
               Sair da plataforma
             </button>
           </div>

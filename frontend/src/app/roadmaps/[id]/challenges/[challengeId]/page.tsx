@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Play, ChevronLeft, Terminal, CheckCircle } from 'lucide-react';
+import { Play, ChevronLeft, Terminal, CheckCircle, Zap } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Challenge {
   id: string;
@@ -20,6 +21,9 @@ export default function ChallengePage({ params }: { params: Promise<{ id: string
   const [output, setOutput] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [success, setSuccess] = useState<boolean | null>(null);
+  const [xpEarned, setXpEarned] = useState<number | null>(null);
+  const [alreadyCompleted, setAlreadyCompleted] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     async function fetchChallenge() {
@@ -59,6 +63,24 @@ export default function ChallengePage({ params }: { params: Promise<{ id: string
         const combinedOutput = (data.output || '') + (data.stderr || '');
         setOutput(combinedOutput || 'Executado com sucesso, mas sem saída no console.');
         setSuccess(data.success);
+
+        // If execution was successful, register progress and award XP
+        if (data.success && user?.id && !alreadyCompleted) {
+          try {
+            const progressRes = await fetch(`${apiUrl}/progress/complete`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: user.id, challengeId }),
+            });
+            const progressData = await progressRes.json();
+            if (progressRes.ok) {
+              setXpEarned(progressData.data?.xpGained || challenge?.xpReward || 0);
+              setAlreadyCompleted(true);
+            }
+          } catch (progressError) {
+            console.error('Erro ao registrar progresso:', progressError);
+          }
+        }
       }
     } catch (error: any) {
       setOutput(`Erro ao executar o código: ${error.message}`);
@@ -82,6 +104,12 @@ export default function ChallengePage({ params }: { params: Promise<{ id: string
           <ChevronLeft className="w-4 h-4 mr-1" /> Voltar ao Roadmap
         </button>
         <div className="flex items-center gap-4 text-sm">
+          {xpEarned !== null && (
+            <span className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20 font-bold animate-in fade-in zoom-in duration-500">
+              <Zap className="w-3.5 h-3.5" />
+              +{xpEarned} XP Conquistado!
+            </span>
+          )}
           <span className="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-full border border-purple-500/20 shadow-[0_0_10px_rgba(139,92,246,0.1)] font-bold">
             +{challenge.xpReward} XP
           </span>

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { Triangle, QrCode, Fingerprint, Code2, Copy, Image as ImageIcon } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
+import { Triangle, QrCode, Fingerprint, Code2, Copy, Image as ImageIcon, Download, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { toPng } from 'html-to-image';
 
 export default function IdCardPage() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,30 @@ export default function IdCardPage() {
     github: 'thcodex',
     linkedin: 'thcodde',
   });
+  const [isDownloading, setIsDownloading] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = useCallback(async () => {
+    if (!cardRef.current || isDownloading) return;
+    setIsDownloading(true);
+    try {
+      // Capture at 2x resolution for crisp quality
+      const dataUrl = await toPng(cardRef.current, {
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: '#0F111A',
+      });
+      const link = document.createElement('a');
+      link.download = 'cracha-codetech.png';
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Erro ao gerar imagem:', err);
+      alert('Erro ao gerar o crachá. Tente novamente.');
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [isDownloading]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -46,7 +71,7 @@ export default function IdCardPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-blue-500/20 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity duration-700 rounded-[40px]" />
 
             {/* The Actual ID Card */}
-            <div className="w-[340px] h-[520px] rounded-[32px] bg-white/[0.02] backdrop-blur-2xl border border-white/[0.08] flex flex-col relative overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] transform-gpu transition-transform duration-700 group-hover:scale-[1.02]">
+            <div ref={cardRef} className="w-[340px] h-[520px] rounded-[32px] bg-[#12131C] backdrop-blur-2xl border border-white/[0.08] flex flex-col relative overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] transform-gpu transition-transform duration-700 group-hover:scale-[1.02]">
 
               {/* Top Glass Section (Cover Profile) */}
               <div className="h-64 w-full relative">
@@ -207,11 +232,21 @@ export default function IdCardPage() {
 
                   <button
                     type="button"
-                    onClick={() => alert('Download final requer biblioteca html-to-image/html2canvas!')}
-                    className="flex-[1.5] flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold text-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 transition-all shadow-[0_0_30px_rgba(139,92,246,0.3)] hover:shadow-[0_0_40px_rgba(139,92,246,0.5)] hover:scale-[1.02] active:scale-95 border border-purple-400/20"
+                    onClick={handleDownload}
+                    disabled={isDownloading}
+                    className="flex-[1.5] flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold text-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 transition-all shadow-[0_0_30px_rgba(139,92,246,0.3)] hover:shadow-[0_0_40px_rgba(139,92,246,0.5)] hover:scale-[1.02] active:scale-95 border border-purple-400/20 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
-                    <ImageIcon className="w-4 h-4" />
-                    Baixar Crachá Premium
+                    {isDownloading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Gerando...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4" />
+                        Baixar Crachá Premium
+                      </>
+                    )}
                   </button>
                 </div>
 
