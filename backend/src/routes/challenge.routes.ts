@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../prisma';
+import { requireAuth } from '../middleware/authMiddleware';
 import vm from 'vm';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Get challenge details
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
@@ -25,8 +25,8 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-// Execute challenge code locally via Node VM
-router.post('/:id/execute', async (req: Request, res: Response): Promise<void> => {
+// Execute challenge code locally via Node VM (requires authentication)
+router.post('/:id/execute', requireAuth, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { code, language } = req.body;
@@ -67,7 +67,7 @@ router.post('/:id/execute', async (req: Request, res: Response): Promise<void> =
       }
     };
 
-    // Prepare secure isolated context
+    // Prepare isolated context with restricted globals
     const context = {
       console: customConsole,
       Math,
@@ -78,7 +78,19 @@ router.post('/:id/execute', async (req: Request, res: Response): Promise<void> =
       Number,
       Boolean,
       Array,
-      Object
+      Object,
+      JSON,
+      Map,
+      Set,
+      RegExp,
+      Error,
+      TypeError,
+      RangeError,
+      isNaN,
+      isFinite,
+      undefined,
+      NaN,
+      Infinity,
     };
 
     vm.createContext(context);
@@ -90,7 +102,7 @@ router.post('/:id/execute', async (req: Request, res: Response): Promise<void> =
       res.json({
         output: output.trim(),
         stderr: stderr.trim(),
-        success: !stderr, // Basic success metric
+        success: !stderr,
         raw: { executedLocally: true }
       });
 

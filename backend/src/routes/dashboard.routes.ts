@@ -1,12 +1,20 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../prisma';
+import { requireAuth, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 
 // GET /api/dashboard/:userId - Returns weekly progress and daily XP
-router.get('/:userId', async (req: Request, res: Response): Promise<void> => {
+router.get('/:userId', requireAuth, async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId } = req.params;
+    const authUser = (req as AuthRequest).user!;
+
+    // Users can only access their own dashboard (admins can access any)
+    if (authUser.userId !== userId && authUser.role !== 'admin') {
+      res.status(403).json({ error: 'Acesso negado.' });
+      return;
+    }
 
     // 1. Get user IdCard for total XP / level
     const idCard = await prisma.idCard.findUnique({

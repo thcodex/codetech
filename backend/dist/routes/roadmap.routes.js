@@ -14,37 +14,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const prisma_1 = __importDefault(require("../prisma"));
+const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = (0, express_1.Router)();
-// CREATE: Post a new roadmap
-router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// CREATE: Post a new roadmap (Admin only)
+router.post('/', authMiddleware_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, description, level, authorId } = req.body;
-        // Validate request body
+        const { title, description, level } = req.body;
         if (!title || !description || !level) {
             return res.status(400).json({ error: 'Title, description and level are required.' });
         }
-        // For testing/mocking since User auth isn't setup fully:
-        // We'll create a default user if authorId is missing to satisfy the foreign key constraint.
-        let finalAuthorId = authorId;
-        if (!finalAuthorId) {
-            let defaultUser = yield prisma_1.default.user.findFirst();
-            if (!defaultUser) {
-                defaultUser = yield prisma_1.default.user.create({
-                    data: {
-                        name: 'Admin',
-                        email: 'admin@codetech.dev',
-                        password: 'password123',
-                    }
-                });
-            }
-            finalAuthorId = defaultUser.id;
-        }
+        // Get author ID from authenticated JWT token
+        const authorId = req.user.userId;
         const roadmap = yield prisma_1.default.roadmap.create({
             data: {
                 title,
                 description,
                 level,
-                authorId: finalAuthorId,
+                authorId,
             },
         });
         return res.status(201).json(roadmap);
@@ -97,8 +83,8 @@ router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }));
-// UPDATE: Update a roadmap
-router.put('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// UPDATE: Update a roadmap (Admin only)
+router.put('/:id', authMiddleware_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
         const { title, description, level } = req.body;
@@ -109,15 +95,15 @@ router.put('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         return res.status(200).json(roadmap);
     }
     catch (error) {
-        if (error.code === 'P2025') { // Prisma 'Record to update not found.'
+        if (error.code === 'P2025') {
             return res.status(404).json({ error: 'Roadmap not found.' });
         }
         console.error('Error updating roadmap:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 }));
-// DELETE: Remove a roadmap
-router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// DELETE: Remove a roadmap (Admin only)
+router.delete('/:id', authMiddleware_1.requireAdmin, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
         yield prisma_1.default.roadmap.delete({
@@ -126,7 +112,7 @@ router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return res.status(204).send();
     }
     catch (error) {
-        if (error.code === 'P2025') { // Prisma 'Record to delete not found.'
+        if (error.code === 'P2025') {
             return res.status(404).json({ error: 'Roadmap not found.' });
         }
         console.error('Error deleting roadmap:', error);

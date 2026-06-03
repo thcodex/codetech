@@ -24,7 +24,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function NovoRoadmap() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState('');
-  const { user } = useAuth();
+  const { user, getAuthHeaders } = useAuth();
 
   // Redirect non-admins
   useEffect(() => {
@@ -52,10 +52,7 @@ export default function NovoRoadmap() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
       const res = await fetch(`${apiUrl}/roadmaps`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-user-id': user?.id || '',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
       });
 

@@ -14,13 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const prisma_1 = __importDefault(require("../prisma"));
+const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = (0, express_1.Router)();
 // Gamification: Complete a challenge and earn XP
-router.post('/complete', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/complete', authMiddleware_1.requireAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { userId, challengeId } = req.body;
-        if (!userId || !challengeId) {
-            return res.status(400).json({ error: 'Parâmetros userId e challengeId são obrigatórios.' });
+        const { challengeId } = req.body;
+        // Use userId from JWT token instead of request body
+        const userId = req.user.userId;
+        if (!challengeId) {
+            return res.status(400).json({ error: 'Parâmetro challengeId é obrigatório.' });
         }
         // 1. Verify if the challenge exists
         const challenge = yield prisma_1.default.challenge.findUnique({

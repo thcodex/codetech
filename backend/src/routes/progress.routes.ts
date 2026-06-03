@@ -1,15 +1,18 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../prisma';
+import { requireAuth, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 
 // Gamification: Complete a challenge and earn XP
-router.post('/complete', async (req: Request, res: Response) => {
+router.post('/complete', requireAuth, async (req: Request, res: Response) => {
   try {
-    const { userId, challengeId } = req.body;
+    const { challengeId } = req.body;
+    // Use userId from JWT token instead of request body
+    const userId = (req as AuthRequest).user!.userId;
 
-    if (!userId || !challengeId) {
-      return res.status(400).json({ error: 'Parâmetros userId e challengeId são obrigatórios.' });
+    if (!challengeId) {
+      return res.status(400).json({ error: 'Parâmetro challengeId é obrigatório.' });
     }
 
     // 1. Verify if the challenge exists

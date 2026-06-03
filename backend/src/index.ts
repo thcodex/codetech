@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import roadmapRoutes from './routes/roadmap.routes';
 import progressRoutes from './routes/progress.routes';
 import challengeRoutes from './routes/challenge.routes';
@@ -15,6 +16,35 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Rate limiting
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: { error: 'Muitas requisições. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Muitas tentativas de login. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const executeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: { error: 'Limite de execuções atingido. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api/', globalLimiter);
+app.use('/api/auth', authLimiter);
+app.use('/api/challenges', executeLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);

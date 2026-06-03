@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -38,7 +39,7 @@ const roadmapsData = [
   }
 ];
 
-// 5 Admin profiles
+// 5 Admin profiles (passwords will be hashed)
 const adminProfiles = [
   { name: "Thiago Ramos",      email: "thiago@codetech.dev",   password: "admin123", role: "admin" },
   { name: "Rafael Pedro",      email: "rafael@codetech.dev",   password: "admin123", role: "admin" },
@@ -56,11 +57,19 @@ async function main() {
   await prisma.idCard.deleteMany({});
   await prisma.user.deleteMany({});
 
-  console.log("👑 Criando 5 perfis de Admin...");
+  console.log("👑 Criando 5 perfis de Admin (senhas com hash bcrypt)...");
+
+  // Hash the admin password once (all admins share the same dev password)
+  const hashedPassword = await bcrypt.hash('admin123', 12);
 
   const createdAdmins = [];
   for (const admin of adminProfiles) {
-    const user = await prisma.user.create({ data: admin });
+    const user = await prisma.user.create({
+      data: {
+        ...admin,
+        password: hashedPassword,
+      },
+    });
 
     // Create IdCard for each admin
     await prisma.idCard.create({
@@ -98,7 +107,7 @@ async function main() {
 
   console.log("✅ DB Seed concluído com sucesso!");
   console.log(`\n📋 Resumo:`);
-  console.log(`   👑 ${createdAdmins.length} Admins criados`);
+  console.log(`   👑 ${createdAdmins.length} Admins criados (senhas hashadas com bcrypt)`);
   console.log(`   🗺️  ${roadmapsData.length} Roadmaps criados`);
   console.log(`   🎯 ${roadmapsData.reduce((a, r) => a + r.challenges.length, 0)} Desafios criados`);
 }

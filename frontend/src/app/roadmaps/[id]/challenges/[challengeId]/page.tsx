@@ -3,6 +3,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Play, ChevronLeft, Terminal, CheckCircle, Zap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import confetti from 'canvas-confetti';
 
 interface Challenge {
   id: string;
@@ -23,7 +24,7 @@ export default function ChallengePage({ params }: { params: Promise<{ id: string
   const [success, setSuccess] = useState<boolean | null>(null);
   const [xpEarned, setXpEarned] = useState<number | null>(null);
   const [alreadyCompleted, setAlreadyCompleted] = useState(false);
-  const { user } = useAuth();
+  const { user, getAuthHeaders, refreshUserData } = useAuth();
 
   useEffect(() => {
     async function fetchChallenge() {
@@ -51,8 +52,8 @@ export default function ChallengePage({ params }: { params: Promise<{ id: string
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
       const res = await fetch(`${apiUrl}/challenges/${challengeId}/execute`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, language: 'javascript' }) // Hardcoded JS for now
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ code, language: 'javascript' })
       });
       const data = await res.json();
       
@@ -69,13 +70,24 @@ export default function ChallengePage({ params }: { params: Promise<{ id: string
           try {
             const progressRes = await fetch(`${apiUrl}/progress/complete`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId: user.id, challengeId }),
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ challengeId }),
             });
             const progressData = await progressRes.json();
             if (progressRes.ok) {
               setXpEarned(progressData.data?.xpGained || challenge?.xpReward || 0);
               setAlreadyCompleted(true);
+              
+              // Shoot confetti!
+              confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#8B5CF6', '#10B981', '#F59E0B']
+              });
+
+              // Sync XP with global state
+              await refreshUserData();
             }
           } catch (progressError) {
             console.error('Erro ao registrar progresso:', progressError);

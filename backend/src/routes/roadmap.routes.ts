@@ -1,42 +1,27 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../prisma';
-import { requireAdmin } from '../middleware/requireAdmin';
+import { requireAdmin, AuthRequest } from '../middleware/authMiddleware';
 
 const router = Router();
 
 // CREATE: Post a new roadmap (Admin only)
 router.post('/', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const { title, description, level, authorId } = req.body;
+    const { title, description, level } = req.body;
     
-    // Validate request body
     if (!title || !description || !level) {
       return res.status(400).json({ error: 'Title, description and level are required.' });
     }
 
-    // For testing/mocking since User auth isn't setup fully:
-    // We'll create a default user if authorId is missing to satisfy the foreign key constraint.
-    let finalAuthorId = authorId;
-    if (!finalAuthorId) {
-      let defaultUser = await prisma.user.findFirst();
-      if (!defaultUser) {
-        defaultUser = await prisma.user.create({
-          data: {
-            name: 'Admin',
-            email: 'admin@codetech.dev',
-            password: 'password123',
-          }
-        });
-      }
-      finalAuthorId = defaultUser.id;
-    }
+    // Get author ID from authenticated JWT token
+    const authorId = (req as AuthRequest).user!.userId;
 
     const roadmap = await prisma.roadmap.create({
       data: {
         title,
         description,
         level,
-        authorId: finalAuthorId,
+        authorId,
       },
     });
     
@@ -109,7 +94,7 @@ router.put('/:id', requireAdmin, async (req: Request, res: Response) => {
     
     return res.status(200).json(roadmap);
   } catch (error: any) {
-    if (error.code === 'P2025') { // Prisma 'Record to update not found.'
+    if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Roadmap not found.' });
     }
     console.error('Error updating roadmap:', error);
@@ -128,7 +113,7 @@ router.delete('/:id', requireAdmin, async (req: Request, res: Response) => {
     
     return res.status(204).send();
   } catch (error: any) {
-    if (error.code === 'P2025') { // Prisma 'Record to delete not found.'
+    if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Roadmap not found.' });
     }
     console.error('Error deleting roadmap:', error);

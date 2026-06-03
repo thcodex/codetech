@@ -32,14 +32,16 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const { user } = useAuth();
+  const { user, getAuthHeaders } = useAuth();
 
   const fetchDashboard = useCallback(async (showRefreshIndicator = false) => {
     if (!user?.id) return;
     if (showRefreshIndicator) setIsRefreshing(true);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
-      const res = await fetch(`${apiUrl}/dashboard/${user.id}`);
+      const res = await fetch(`${apiUrl}/dashboard/${user.id}`, {
+        headers: getAuthHeaders(),
+      });
       if (res.ok) {
         const dashboardData = await res.json();
         setData(dashboardData);
@@ -51,7 +53,7 @@ export default function DashboardPage() {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [user?.id]);
+  }, [user?.id, getAuthHeaders]);
 
   // Initial fetch
   useEffect(() => {

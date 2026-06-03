@@ -4,10 +4,12 @@ import { useState, useRef, useCallback } from 'react';
 import { Triangle, QrCode, Fingerprint, Code2, Copy, Image as ImageIcon, Download, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { toPng } from 'html-to-image';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function IdCardPage() {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    nome: 'Thiago Ramos',
+    nome: user?.name || 'Thiago Ramos',
     cargo: 'Desenvolvedor Frontend',
     github: 'thcodex',
     linkedin: 'thcodde',
@@ -105,9 +107,15 @@ export default function IdCardPage() {
                 <h2 className="text-3xl font-bold tracking-tight truncate filter drop-shadow hover:text-purple-300 transition-colors">
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">{formData.nome || 'Seu Nome'}</span>
                 </h2>
-                <p className="text-[#8F95B2] text-sm font-medium mt-1 truncate">
-                  {formData.cargo || 'Cargo'}
-                </p>
+                <div className="flex items-center gap-3 mt-2">
+                  <p className="text-[#8F95B2] text-sm font-medium truncate">
+                    {formData.cargo || 'Cargo'}
+                  </p>
+                  <div className="flex gap-2">
+                    <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold uppercase tracking-widest">Nível {user?.idCard?.level || 1}</span>
+                    <span className="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/30 font-bold uppercase tracking-widest">{user?.idCard?.xp || 0} XP</span>
+                  </div>
+                </div>
 
                 <div className="my-8 flex gap-6">
                   <div className="flex-1 space-y-1 group/item">
