@@ -1,5 +1,7 @@
 import { RoadmapsClient } from './RoadmapsClient';
 
+export const dynamic = 'force-dynamic';
+
 // Defines the Roadmap type corresponding to the Prisma model
 interface Roadmap {
   id: string;
