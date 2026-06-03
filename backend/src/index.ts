@@ -12,7 +12,17 @@ const port = process.env.PORT || 8080;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (origin.includes('localhost') || origin.includes('vercel.app') || origin.includes('thcode.com.br')) {
+      return callback(null, true);
+    }
+    // Allow if FRONTEND_URL matches
+    if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS blocked by CodeTech API'), false);
+  },
   credentials: true
 }));
 app.use(express.json());
