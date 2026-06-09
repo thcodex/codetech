@@ -93,7 +93,7 @@ export default function DashboardPage() {
           </h1>
           <p className="text-[#8F95B2] text-sm mt-2 font-medium">Acompanhe sua evolução semanal e os XP dos desafios.</p>
         </div>
-        <div className="hidden md:flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {lastUpdated && (
             <span className="text-[#8F95B2]/60 text-[11px] font-medium">
               Atualizado {lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
