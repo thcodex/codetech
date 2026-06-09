@@ -74,8 +74,18 @@ export default async function RoadmapDetailsPage({ params }: { params: Promise<{
             <p className="text-[#8F95B2] text-[15px] leading-relaxed mb-6 relative z-10 font-medium">
               Para acompanhar, baixe o conteúdo disponibilizado no link abaixo. Nele você encontrará os arquivos necessários para aprender, além do e-book em PDF com todo o conteúdo abordado no curso.
             </p>
-            <a href="#" className="inline-flex items-center text-purple-400 hover:text-white font-bold text-sm transition-colors relative z-10 bg-purple-500/10 px-4 py-2 rounded-xl border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-500/40 shadow-sm">
-              Acessar o PDF do material
+            <a 
+              href={
+                roadmap.title.toLowerCase().includes('frontend') ? '/pdfs/frontend.pdf' :
+                roadmap.title.toLowerCase().includes('backend') ? '/pdfs/backend.pdf' :
+                roadmap.title.toLowerCase().includes('ui') || roadmap.title.toLowerCase().includes('design') ? '/pdfs/design.pdf' :
+                '#'
+              }
+              download
+              className="inline-flex items-center gap-2 text-purple-400 hover:text-white font-bold text-sm transition-all relative z-10 bg-purple-500/10 px-5 py-3 rounded-xl border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-500/40 shadow-sm hover:scale-[1.02] active:scale-95"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Baixar PDF do Material
             </a>
           </div>
         </div>
