@@ -117,6 +117,17 @@ export default async function RoadmapDetailsPage({ params }: { params: Promise<{
              )}
           </div>
 
+          <div className="bg-white/[0.02] backdrop-blur-xl rounded-[32px] border border-white/[0.08] p-8 shadow-2xl relative overflow-hidden group">
+             <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-gradient-to-bl from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-tr-[32px]" />
+             <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] mb-3 relative z-10"><span className="bg-clip-text text-transparent bg-gradient-to-r from-[#8F95B2] to-emerald-400">Certificado Oficial</span></h3>
+             <p className="text-[#8F95B2] text-sm leading-relaxed mb-6 font-medium relative z-10">
+               Gere seu certificado de conclusão para comprovar seu aprendizado.
+             </p>
+             <button className="w-full py-4 px-6 rounded-2xl text-center font-bold text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-all shadow-sm active:scale-[0.98] relative z-10">
+               Gerar certificado
+             </button>
+          </div>
+
         </div>
 
       </div>
